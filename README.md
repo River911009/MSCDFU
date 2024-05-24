@@ -469,10 +469,10 @@ void GotoApplication(uint32_t address){
 
 ### 5. Done Check List
 
-- [v] RAM disk initialize
-- [v] USB Mass Storage Class
-- [v] FATFS diskio
-- [v] Clear register and jump to address
+- [x] RAM disk initialize
+- [x] USB Mass Storage Class
+- [x] FATFS diskio
+- [x] Clear register and jump to address
 - [ ] Flash directly access with RAM buffer
 - [ ] Increase block size from 0x200 to 0x1000.
 
