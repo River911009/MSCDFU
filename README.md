@@ -464,15 +464,18 @@ void GotoApplication(uint32_t address){
 2. Drag & drop a executable *.BIN file into MSCDFU, it will program into app address immediately.
 3. MSCDFU will auto execute app once programmed.
 4. To run MSCDFU bootloader after programmed, only need to erase the CMD addres showed in the CONFIG.TXT file when the first programming. The MSCDFU USB disk should appear after reboot.
+5. Change FLASH address of the application project to APP_ADDRESS where set in CONFIG.TXT file before compile.
 
 ---
 
 ### 5. Done Check List
 
-- [v] RAM disk initialize
-- [v] USB Mass Storage Class
-- [v] FATFS diskio
-- [v] Clear register and jump to address
+- [x] RAM disk initialize
+- [x] USB Mass Storage Class
+- [x] FATFS diskio
+- [x] Clear register and jump to address
+- [ ] Downsize RAM usage and code.
+- [ ] Turn the DFU CMD and ADDRESS for F4 MCU.(It is now for H753)
 - [ ] Flash directly access with RAM buffer
 - [ ] Increase block size from 0x200 to 0x1000.
 
