@@ -60,7 +60,7 @@ void MX_FATFS_Init(void)
 /* USER CODE BEGIN Application */
 
 
-void getParameter(FIL* fp,TCHAR* str_return,TCHAR* index,int length){
+void getParameterStr(FIL* fp,TCHAR* str_return,TCHAR* index,int length){
   TCHAR str_tmp[100];
 
   f_lseek(fp,0);
@@ -70,6 +70,13 @@ void getParameter(FIL* fp,TCHAR* str_return,TCHAR* index,int length){
       strncpy(str_return,&str_tmp[length+1],11);
     }
   }
+}
+
+uint32_t getParameterInt(FIL* fp,TCHAR* index,int length){
+  TCHAR str_tmp[11];
+
+  getParameterStr(fp,str_tmp,index,length);
+  return(strtoul(str_tmp,NULL,0));
 }
 
 int FS_Initialize(void){
@@ -82,9 +89,9 @@ int FS_Initialize(void){
     if(f_open(&USERFile,CONFIG_FILENAME,(FA_CREATE_ALWAYS|FA_WRITE))==FR_OK){
       /* Write data to the text file */
       f_printf(&USERFile,"%s\n","MSCDFU_VERSION:v1.0");
-      f_printf(&USERFile,"%s\n","MSCDFU_DATE:20240521");
-      f_printf(&USERFile,"%s\n","CMD_ADDRESS:0x08020000");
-      f_printf(&USERFile,"%s\n","APP_ADDRESS:0x08040000");
+      f_printf(&USERFile,"%s\n","MSCDFU_DATE:20240101");
+      f_printf(&USERFile,"%s\n","CMD_ADDRESS:0x08010000");
+      f_printf(&USERFile,"%s\n","APP_ADDRESS:0x08020000");
       f_printf(&USERFile,"%s\n","APP_MASK:0x2FFE0000");
       f_printf(&USERFile,"%s\n","APP_CHECK:0x20000000");
       f_printf(&USERFile,"%s\n","APP_FILENAME:FIRMWAR.BIN");
@@ -97,7 +104,6 @@ int FS_Initialize(void){
 }
 
 int FS_Synchronize(void){
-  FILINFO  fno;
   TCHAR    read_string[11];
   uint32_t data_tmp;
   uint32_t data_mask;
@@ -108,22 +114,18 @@ int FS_Synchronize(void){
     if(f_mount(&USERFatFS,(TCHAR const*)USERPath,0)==FR_OK){
 
       if(f_open(&USERFile,CONFIG_FILENAME,(FA_READ))==FR_OK){
-	getParameter(&USERFile,read_string,"APP_MASK",8);
-	data_mask=strtoul(read_string,NULL,0);
-	getParameter(&USERFile,read_string,"APP_CHECK",9);
-	data_check=strtoul(read_string,NULL,0);
-	getParameter(&USERFile,APP_FILENAME,"APP_FILENAME",12);
+	data_mask=getParameterInt(&USERFile,"APP_MASK",8);
+	data_check=getParameterInt(&USERFile,"APP_CHECK",9);
+	getParameterStr(&USERFile,APP_FILENAME,"APP_FILENAME",12);
       }
 
-      if(f_stat(APP_FILENAME,&fno)==FR_OK){
-	if(f_open(&USERFile,APP_FILENAME,(FA_READ))==FR_OK){
-	  UINT byteread;
-	  f_read(&USERFile,&data_tmp,sizeof(data_tmp),&byteread);
-	  if((data_tmp&data_mask)==data_check){
-	    ret=1;
-	  }
-	  f_close(&USERFile);
+      if(f_open(&USERFile,APP_FILENAME,(FA_READ))==FR_OK){
+	UINT byteread;
+	f_read(&USERFile,&data_tmp,sizeof(data_tmp),&byteread);
+	if((data_tmp&data_mask)==data_check){
+	  ret=1;
 	}
+	f_close(&USERFile);
       }
     }
   }
@@ -133,24 +135,34 @@ int FS_Synchronize(void){
 
 int FS_FirmwareUpgrade(void){
   int     ret=0;
-//  UINT    byteread;
-//  uint8_t buffer[32];
+  UINT    byteread;
+  uint8_t buffer[4];
+
+  uint32_t DFU_CMD_ADDRESS=0x08010000;
+  uint32_t APP_ADDRESS=0x08020000;
 
   if(!FATFS_LinkDriver(&USER_Driver,USERPath)){
     if(f_mount(&USERFatFS,(TCHAR const*)USERPath,0)==FR_OK){
 
       f_open(&USERFile,APP_FILENAME,(FA_READ));
       HAL_GPIO_WritePin(LED_GPIO_Port,LED_Pin,GPIO_PIN_SET);
-//      HAL_FLASH_Unlock();
-//      FLASH_Erase_Sector(2,FLASH_BANK_1,FLASH_VOLTAGE_RANGE_2);
-//      for(uint32_t i=0;i<(0x22000/32);i++){
-//	HAL_FLASH_Program(FLASH_TYPEPROGRAM_FLASH_WORD,(APP_ADDRESS+i*32),(uint32_t)&buffer);
-//      }
-//      memset(&buffer,0x00,32);
-//      HAL_FLASH_Program(FLASH_TYPEPROGRAM_FLASH_WORD,DFU_CMD_ADDRESS,(uint32_t)&buffer);
-//      HAL_FLASH_Lock();
+
+      HAL_FLASH_Unlock();
+      FLASH_Erase_Sector(5,FLASH_VOLTAGE_RANGE_3);
+      FLASH_Erase_Sector(6,FLASH_VOLTAGE_RANGE_3);
+      FLASH_Erase_Sector(7,FLASH_VOLTAGE_RANGE_3);
+
+      for(uint32_t i=0;i<(DISK_SIZE/4);i++){
+	f_read(&USERFile,buffer,sizeof(buffer),&byteread);
+	HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD,(APP_ADDRESS+i*4),*(uint32_t*)&buffer);
+      }
+      memset(buffer,0x00,4);
+      HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD,DFU_CMD_ADDRESS,*(uint32_t*)&buffer);
+      HAL_FLASH_Lock();
+
+      HAL_GPIO_WritePin(LED_GPIO_Port,LED_Pin,GPIO_PIN_RESET);
       f_close(&USERFile);
-//      ret=1;
+      ret=1;
     }
   }
   FATFS_UnLinkDriver(USERPath);

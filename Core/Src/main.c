@@ -50,12 +50,6 @@ typedef void (*pFunction)(void);
 
 /* USER CODE BEGIN PV */
 
-
-uint32_t DFU_CMD_ADDRESS =0x08020000;
-uint32_t APP_ADDRESS     =0x08040000;
-uint32_t GOTO_APPLICATION=0x00000000;
-
-
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -69,6 +63,9 @@ void SystemClock_Config(void);
 
 
 void GotoApplication(uint32_t address){
+  uint32_t DFU_CMD_ADDRESS =0x08010000;
+  uint32_t GOTO_APPLICATION=0x00000000;
+
   if((*(volatile uint32_t*)DFU_CMD_ADDRESS)==GOTO_APPLICATION){
     pFunction JumpToApplication=(pFunction)*(volatile uint32_t*)(address+4);
 
@@ -96,7 +93,7 @@ int main(void)
   /* USER CODE BEGIN 1 */
 
 
-//  GotoApplication(APP_ADDRESS);
+  GotoApplication(0x08020000);
 
 
   /* USER CODE END 1 */
@@ -149,7 +146,7 @@ void SystemClock_Config(void)
   /** Configure the main internal regulator output voltage
   */
   __HAL_RCC_PWR_CLK_ENABLE();
-  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
+  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE3);
 
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.

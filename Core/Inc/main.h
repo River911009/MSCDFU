@@ -57,11 +57,11 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define BLOCK_SIZE 0x200
-#define DISK_SIZE 0x1E000
-#define DISK_ADDRESS SRAM1_BASE+0x2000
-#define DISK_NAME "MSCDFU"
 #define CONFIG_FILENAME "CONFIG.TXT"
+#define DISK_NAME "MSCDFU"
+#define DISK_ADDRESS SRAM1_BASE+0x2000
+#define DISK_SIZE 0x1E000
+#define BLOCK_SIZE 0x200
 #define LED_Pin GPIO_PIN_13
 #define LED_GPIO_Port GPIOC
 #define K0_Pin GPIO_PIN_0
