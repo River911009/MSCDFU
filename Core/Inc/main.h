@@ -57,11 +57,19 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define CONFIG_FILENAME "CONFIG.TXT"
-#define DISK_NAME "MSCDFU"
-#define DISK_ADDRESS SRAM1_BASE+0x2000
-#define DISK_SIZE 0x1E000
+#define ADDRESS_APP 0x08010000
+#define ADDRESS_CMD 0x0800D2E0
+#define ADDRESS_IDENTIFY 0x0800D2F0
+#define ADDRESS_RAMDISK SRAM1_BASE+0x2000
 #define BLOCK_SIZE 0x200
+#define CMD_GOTOAPP 0x00000000
+#define CMD_UPGRADE 0xFFFFFFFF
+#define DISK_NAME "MSCDFU"
+#define DISK_SIZE 0x1E000
+#define FILENAME_APP "FIRMWAR.BIN"
+#define FILENAME_CONFIG "CONFIG.TXT"
+#define MSCDFU_DATE 20241009
+#define MSCDFU_VERSION 2
 #define LED_Pin GPIO_PIN_13
 #define LED_GPIO_Port GPIOC
 #define K0_Pin GPIO_PIN_0

@@ -118,7 +118,7 @@ DRESULT USER_read (
 {
   /* USER CODE BEGIN READ */
   uint32_t *pSrcBuffer  =(uint32_t*)buff;
-  uint32_t *pSramAddress=(uint32_t*)(DISK_ADDRESS+(sector*BLOCK_SIZE));
+  uint32_t *pSramAddress=(uint32_t*)(ADDRESS_RAMDISK+(sector*BLOCK_SIZE));
   uint32_t BufferSize   =(BLOCK_SIZE*count);
 
   memcpy(pSrcBuffer,pSramAddress,BufferSize);
@@ -145,7 +145,7 @@ DRESULT USER_write (
 {
   /* USER CODE BEGIN WRITE */
   /* USER CODE HERE */
-  uint32_t *pSramAddress=(uint32_t*)(DISK_ADDRESS+(sector*BLOCK_SIZE));
+  uint32_t *pSramAddress=(uint32_t*)(ADDRESS_RAMDISK+(sector*BLOCK_SIZE));
   uint32_t *pSrcBuffer  =(uint32_t*)buff;
   uint32_t BufferSize   =(BLOCK_SIZE*count);
 

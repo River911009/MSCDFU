@@ -240,7 +240,7 @@ int8_t STORAGE_IsWriteProtected_FS(uint8_t lun)
 int8_t STORAGE_Read_FS(uint8_t lun, uint8_t *buf, uint32_t blk_addr, uint16_t blk_len)
 {
   /* USER CODE BEGIN 6 */
-  memcpy(buf,(uint8_t*)(DISK_ADDRESS+blk_addr*STORAGE_BLK_SIZ),(blk_len*STORAGE_BLK_SIZ));
+  memcpy(buf,(uint8_t*)(ADDRESS_RAMDISK+blk_addr*STORAGE_BLK_SIZ),(blk_len*STORAGE_BLK_SIZ));
 
 
   UNUSED(lun);
@@ -263,7 +263,7 @@ int8_t STORAGE_Read_FS(uint8_t lun, uint8_t *buf, uint32_t blk_addr, uint16_t bl
 int8_t STORAGE_Write_FS(uint8_t lun, uint8_t *buf, uint32_t blk_addr, uint16_t blk_len)
 {
   /* USER CODE BEGIN 7 */
-  memcpy((uint8_t*)(DISK_ADDRESS+blk_addr*STORAGE_BLK_SIZ),buf,(blk_len*STORAGE_BLK_SIZ));
+  memcpy((uint8_t*)(ADDRESS_RAMDISK+blk_addr*STORAGE_BLK_SIZ),buf,(blk_len*STORAGE_BLK_SIZ));
 
 
   UNUSED(lun);

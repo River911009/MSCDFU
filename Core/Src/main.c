@@ -15,6 +15,16 @@
   *
   ******************************************************************************
   */
+
+/**
+  ******************************************************************************
+  * Internal Flash Section Description                                         *
+  ******************************************************************************
+  *  0x08000000-0x0800BFFF  *  Bank 1 Section 0-2  *  MSCDFU                   *
+  *  0x0800C000-0x0800FFFF  *  Bank 1 Section 3    *  DFU cmd for next bootup  *
+  *  0x08010000-0x0807FFFF  *  Bank 1 Section 4-   *  Application              *
+  ******************************************************************************
+  */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
@@ -62,21 +72,42 @@ void SystemClock_Config(void);
 /* USER CODE BEGIN 0 */
 
 
+int Check_License(uint32_t address){
+  int ret;
+  // return 1 if target address was not set yet
+  if((*(uint32_t*)(address  )==0xFFFFFFFF)||\
+     (*(uint32_t*)(address+4)==0xFFFFFFFF)||\
+	 (*(uint32_t*)(address+8)==0xFFFFFFFF)){
+	ret=1;
+  }
+  // return 2 if target address set but not equals to identify code
+  else if((*(uint32_t*)(UID_BASE  ))!=~(*(uint32_t*)(address  ))||\
+		  (*(uint32_t*)(UID_BASE+4))!=~(*(uint32_t*)(address+4 ))||\
+		  (*(uint32_t*)(UID_BASE+8))!=~(*(uint32_t*)(address+8))){
+	ret=2;
+  }
+  else{
+	ret=0;
+  }
+  return(ret);
+}
+
 void GotoApplication(uint32_t address){
-  uint32_t DFU_CMD_ADDRESS =0x08010000;
-  uint32_t GOTO_APPLICATION=0x00000000;
+  // check license before start application
+  if(!Check_License(ADDRESS_IDENTIFY)){
+    // goto application
+    if((*(volatile uint32_t*)ADDRESS_CMD)==CMD_GOTOAPP){
+      pFunction JumpToApplication=(pFunction)*(volatile uint32_t*)(address+4);
 
-  if((*(volatile uint32_t*)DFU_CMD_ADDRESS)==GOTO_APPLICATION){
-    pFunction JumpToApplication=(pFunction)*(volatile uint32_t*)(address+4);
+      SysTick->CTRL=0;
+      SysTick->LOAD=0;
+      SysTick->VAL=0;
 
-    SysTick->CTRL=0;
-    SysTick->LOAD=0;
-    SysTick->VAL=0;
-
-    __set_MSP(*(volatile uint32_t*)address);
-    SCB->VTOR=address;
-    JumpToApplication();
-    while(1){}
+      __set_MSP(*(volatile uint32_t*)address);
+      SCB->VTOR=address;
+      JumpToApplication();
+      while(1){}
+    }
   }
 }
 
@@ -93,7 +124,7 @@ int main(void)
   /* USER CODE BEGIN 1 */
 
 
-  GotoApplication(0x08020000);
+  GotoApplication(ADDRESS_APP);
 
 
   /* USER CODE END 1 */
