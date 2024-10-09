@@ -34,7 +34,7 @@ typedef enum{
 }FS_FileOperationsTypeDef;
 
 FS_FileOperationsTypeDef file_operation_state=FS_APPLICATION_IDLE;
-TCHAR IDENTIFY_NAME[8]={'U','I','D','.','T','X','T'};
+TCHAR IDENTIFY_NAME[11]={'L','I','C','E','N','S','E','.','T','X','T'};
 TCHAR APP_NAME[11];
 uint32_t app_last_time;
 
