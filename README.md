@@ -460,12 +460,13 @@ void GotoApplication(uint32_t address){
 
 ### 4. Guide of the System
 
-1. Plug in to a computer. MSCDFU device should appears as a USB disk when it has no app programmed.
+1. Plug in to a computer. MSCDFU device should appears as a USB disk when it has no app programmed or no license code.
 2. Drag & drop a executable *.BIN file into MSCDFU, it will program into app address immediately.
-3. MSCDFU will auto execute app once programmed.
-4. To run MSCDFU bootloader after programmed, only need to erase the CMD addres showed in the CONFIG.TXT file when the first programming. The MSCDFU USB disk should appear after reboot.
-5. Change FLASH address of the application project to APP_ADDRESS where set in CONFIG.TXT file before compile.
-6. ...
+3. Then, drop LICENSE.TXT file into MSCDFU.
+4. MSCDFU will auto execute app at next bootup.
+5. To run MSCDFU bootloader after programmed, only need to erase the ADDRESS_CMD showed in the CONFIG.TXT file when the first programming. The MSCDFU USB disk should appear after reboot.
+6. Change FLASH address of the application project to ADDRESS_APP where set in CONFIG.TXT file before compile.
+7. To unlock the MSCDFU, here using the chip UID as the unique 96-bit code. The LICENSE.TXT file have to include "UID:xxxxxxxxxxxxxxxxxxxxxxxx".
 
 ---
 
@@ -479,5 +480,6 @@ void GotoApplication(uint32_t address){
 - [x] Turn the DFU CMD and ADDRESS for F4 MCU.(It is now for F411)
 - [ ] Flash directly access with RAM buffer
 - [ ] Increase block size from 0x200 to 0x1000.
+- [x] Anti-clone system.
 
 ---
